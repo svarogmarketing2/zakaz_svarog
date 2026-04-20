@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Интерактивная матрица ассортимента — Сварог</title>
+<style>
+:root {
+  --bg:#f5f7fb;
+  --panel:#ffffff;
+  --text:#1f2a37;
+  --muted:#6b7280;
+  --line:#dde4ef;
+  --brand:#2563eb;
+  --brand2:#7c3aed;
+  --basic:#1fa85b;
+  --standard:#1d84f3;
+  --pro:#e15642;
+  --shadow:0 12px 36px rgba(30,41,59,.08);
+  --radius:18px;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(900px 400px at 10% 0%, rgba(37,99,235,.08), transparent 55%),
+    radial-gradient(700px 350px at 100% 0%, rgba(124,58,237,.07), transparent 50%),
+    var(--bg);
+  color:var(--text);
+}
+.wrapper {
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 28px;
+}
+.hero {
+  background: linear-gradient(135deg, #10213d, #19386a 60%, #5b36b3);
+  border-radius: 26px;
+  padding: 28px 30px;
+  color:#fff;
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+}
+.hero h1 {
+  margin:0 0 8px 0;
+  font-size: 34px;
+  line-height:1.08;
+}
+.hero p {
+  margin:0;
+  color: rgba(255,255,255,.84);
+  font-size:15px;
+}
+.kpis {
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap:14px;
+  margin: 18px 0 22px;
+}
+.kpi {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px 18px 14px;
+  box-shadow: var(--shadow);
+}
+.kpi .v {
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.kpi .l {
+  color:var(--muted);
+  font-size:13px;
+}
+.controls {
+  display:grid;
+  grid-template-columns: 1.4fr repeat(4, .8fr) auto;
+  gap:12px;
+  align-items:end;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:18px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+label {
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+input, select, button {
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px 12px;
+  font-size:14px;
+  background:#fff;
+  color:var(--text);
+}
+button {
+  background:linear-gradient(135deg, var(--brand), var(--brand2));
+  color:#fff;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+}
+button.secondary {
+  background:#eef3fb;
+  color:#27416f;
+  border:1px solid var(--line);
+}
+.matrix-summary {
+  display:grid;
+  grid-template-columns: 320px 1fr;
+  gap:18px;
+  margin-bottom:18px;
+}
+.side-panel, .content-panel {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow: var(--shadow);
+}
+.side-panel {
+  padding:18px;
+}
+.side-panel h3, .content-panel h3 {
+  margin:0 0 14px 0;
+  font-size:18px;
+}
+.category-list {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.category-card {
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 14px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.category-card:hover {
+  transform: translateY(-1px);
+  box-shadow:0 10px 24px rgba(30,41,59,.08);
+}
+.category-card.active {
+  border-color:#aac5ff;
+  background:#f3f8ff;
+}
+.category-card .t {
+  font-weight:700;
+  margin-bottom:4px;
+}
+.category-card .s {
+  color:var(--muted);
+  font-size:13px;
+}
+.content-panel {
+  padding:18px;
+}
+.group-block {
+  border:1px solid var(--line);
+  border-radius:18px;
+  margin-bottom:14px;
+  overflow:hidden;
+}
+.group-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  background:#f7f9fc;
+  padding:14px 16px;
+  cursor:pointer;
+}
+.group-header h4 {
+  margin:0;
+  font-size:16px;
+}
+.group-header .meta {
+  color:var(--muted);
+  font-size:13px;
+}
+.group-body {
+  padding:0;
+}
+table {
+  width:100%;
+  border-collapse:collapse;
+}
+th, td {
+  padding:12px 14px;
+  border-top:1px solid #edf1f7;
+  text-align:left;
+  vertical-align:top;
+  font-size:14px;
+}
+th {
+  font-size:12px;
+  color:var(--muted);
+  background:#fbfcfe;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+tr:hover td {
+  background:#fbfdff;
+}
+.badge {
+  display:inline-flex;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  color:#fff;
+  white-space:nowrap;
+}
+.badge.basic { background:var(--basic); }
+.badge.standard { background:var(--standard); }
+.badge.pro { background:var(--pro); }
+.link {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:#2159c9;
+  text-decoration:none;
+  font-weight:600;
+}
+.muted {
+  color:var(--muted);
+}
+.footer-note {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:12px;
+}
+.hidden { display:none; }
+@media (max-width: 1100px) {
+  .controls, .matrix-summary, .kpis {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="hero">
+    <h1>Интерактивная структурированная матрица ассортимента</h1>
+    <p>Разбивка по продукции, группам, классам, гарантии и активным ссылкам на сайт Сварог. Основано на файле «Классификация ГО 2026».</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">6</div><div class="l">товарных направлений</div></div>
+    <div class="kpi"><div class="v">106</div><div class="l">SKU в интерактивной матрице</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">класса продукции</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">уровня гарантии</div></div>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label>Поиск</label>
+      <input id="searchInput" type="text" placeholder="Название, код, группа, категория..." />
+    </div>
+    <div>
+      <label>Категория</label>
+      <select id="categoryFilter">
+        <option value="">Все</option>
+      </select>
+    </div>
+    <div>
+      <label>Класс</label>
+      <select id="classFilter">
+        <option value="">Все</option>
+      </select>
+    </div>
+    <div>
+      <label>Гарантия</label>
+      <select id="warrantyFilter">
+        <option value="">Все</option>
+      </select>
+    </div>
+    <div>
+      <label>Группа</label>
+      <select id="groupFilter">
+        <option value="">Все</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button id="applyBtn">Применить</button>
+      <button class="secondary" id="resetBtn" type="button">Сброс</button>
+    </div>
+  </div>
+
+  <div class="matrix-summary">
+    <div class="side-panel">
+      <h3>Товарные направления</h3>
+      <div id="categoryList" class="category-list"></div>
+    </div>
+    <div class="content-panel">
+      <h3 id="contentTitle">Матрица ассортимента</h3>
+      <div id="contentArea"></div>
+      <div class="footer-note">Ссылки ведут на поиск по сайту Сварог по названию модели. Если потребуется, могу заменить на прямые URL карточек товаров.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = [{"category": "РЕДУКТОРЫ", "total": 29.0, "items": [{"category": "РЕДУКТОРЫ", "group": "КИСЛОРОД", "name": "БКО-50-12,5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "98848", "qty": "5", "url": "https://svarog-rf.ru/search/node/БКО-50-12,5"}, {"category": "РЕДУКТОРЫ", "group": "КИСЛОРОД", "name": "БКО 50-5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101750", "qty": "", "url": "https://svarog-rf.ru/search/node/БКО%2050-5"}, {"category": "РЕДУКТОРЫ", "group": "КИСЛОРОД", "name": "БКО 50-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101749", "qty": "", "url": "https://svarog-rf.ru/search/node/БКО%2050-4"}, {"category": "РЕДУКТОРЫ", "group": "КИСЛОРОД", "name": "БКО-50М", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102676", "qty": "", "url": "https://svarog-rf.ru/search/node/БКО-50М"}, {"category": "РЕДУКТОРЫ", "group": "КИСЛОРОД", "name": "TECH CONTROL OX", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98008", "qty": "", "url": "https://svarog-rf.ru/search/node/TECH%20CONTROL%20OX"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО-5М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "98572", "qty": "9", "url": "https://svarog-rf.ru/search/node/БПО-5М"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "РДСГ—1—1.2", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "94947", "qty": "", "url": "https://svarog-rf.ru/search/node/РДСГ—1—1.2"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5-5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101752", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205-5"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5—5—1", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101767", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205—5—1"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5—5—0", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101771", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205—5—0"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101751", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205-4"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5—4—1", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101769", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205—4—1"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "БПО 5—4—0", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101773", "qty": "", "url": "https://svarog-rf.ru/search/node/БПО%205—4—0"}, {"category": "РЕДУКТОРЫ", "group": "ПРОПАН", "name": "ТECH CONTROL PB", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98010", "qty": "", "url": "https://svarog-rf.ru/search/node/ТECH%20CONTROL%20PB"}, {"category": "РЕДУКТОРЫ", "group": "УГЛЕКИСЛОТА", "name": "УР-6-6М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "98573", "qty": "4", "url": "https://svarog-rf.ru/search/node/УР-6-6М"}, {"category": "РЕДУКТОРЫ", "group": "УГЛЕКИСЛОТА", "name": "УР-6-5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101753", "qty": "", "url": "https://svarog-rf.ru/search/node/УР-6-5"}, {"category": "РЕДУКТОРЫ", "group": "УГЛЕКИСЛОТА", "name": "БУО 5-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102157", "qty": "", "url": "https://svarog-rf.ru/search/node/БУО%205-4"}, {"category": "РЕДУКТОРЫ", "group": "УГЛЕКИСЛОТА", "name": "TECH CONTROL CD", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98011", "qty": "", "url": "https://svarog-rf.ru/search/node/TECH%20CONTROL%20CD"}, {"category": "РЕДУКТОРЫ", "group": "АЦЕТИЛЕН", "name": "БАО-5М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "99439", "qty": "5", "url": "https://svarog-rf.ru/search/node/БАО-5М"}, {"category": "РЕДУКТОРЫ", "group": "АЦЕТИЛЕН", "name": "БАО 5-5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101745", "qty": "", "url": "https://svarog-rf.ru/search/node/БАО%205-5"}, {"category": "РЕДУКТОРЫ", "group": "АЦЕТИЛЕН", "name": "БАО 5-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101744", "qty": "", "url": "https://svarog-rf.ru/search/node/БАО%205-4"}, {"category": "РЕДУКТОРЫ", "group": "АЦЕТИЛЕН", "name": "БАО 5-5 КР", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "99438", "qty": "", "url": "https://svarog-rf.ru/search/node/БАО%205-5%20КР"}, {"category": "РЕДУКТОРЫ", "group": "АЦЕТИЛЕН", "name": "TECH CONTROL AC", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98006", "qty": "", "url": "https://svarog-rf.ru/search/node/TECH%20CONTROL%20AC"}, {"category": "РЕДУКТОРЫ", "group": "ВОДОРОД", "name": "БВО 80-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101746", "qty": "1", "url": "https://svarog-rf.ru/search/node/БВО%2080-4"}, {"category": "РЕДУКТОРЫ", "group": "ГЕЛИЙ", "name": "БГО-50-5-ВШ", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101748", "qty": "1", "url": "https://svarog-rf.ru/search/node/БГО-50-5-ВШ"}, {"category": "РЕДУКТОРЫ", "group": "ИНЕРТНЫЙ ГАЗ", "name": "Инертный газ", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101775", "qty": "4", "url": "https://svarog-rf.ru/search/node/Инертный%20газ"}, {"category": "РЕДУКТОРЫ", "group": "ИНЕРТНЫЙ ГАЗ", "name": "(N,AIR) PRO CONTROL", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102145", "qty": "", "url": "https://svarog-rf.ru/search/node/(N,AIR)%20PRO%20CONTROL"}, {"category": "РЕДУКТОРЫ", "group": "ИНЕРТНЫЙ ГАЗ", "name": "TECH CONTROL UNI", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98012", "qty": "", "url": "https://svarog-rf.ru/search/node/TECH%20CONTROL%20UNI"}, {"category": "РЕДУКТОРЫ", "group": "ИНЕРТНЫЙ ГАЗ", "name": "РВД-100 - ВЫСОКОЕ ДАВЛЕНИЕ", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "101747", "qty": "", "url": "https://svarog-rf.ru/search/node/РВД-100%20-%20ВЫСОКОЕ%20ДАВЛЕНИЕ"}]}, {"category": "РЕГУЛЯТОРЫ", "total": 29.0, "items": [{"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "У-30-5М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "99000", "qty": "6", "url": "https://svarog-rf.ru/search/node/У-30-5М"}, {"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "АР-40-5М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "99427", "qty": "", "url": "https://svarog-rf.ru/search/node/АР-40-5М"}, {"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "У-30/АР-40-5М", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "98849", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-5М"}, {"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "У-30/АР-40-5", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101743", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-5"}, {"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "У-30/АР-40-4", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101742", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-4"}, {"category": "РЕГУЛЯТОРЫ", "group": "С манометром- датчиком расхода", "name": "ТECH CONTROL UNI AR/CO2", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "98001", "qty": "", "url": "https://svarog-rf.ru/search/node/ТECH%20CONTROL%20UNI%20AR/CO2"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "У-30/АР-40-Р", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "100544", "qty": "6", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "У-30/АР-40-Р-2", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "100545", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-Р-2"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "PRO CONTROL двухступенчатый AR/CO2 1Р", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101741", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20двухступенчатый%20AR/CO2%201Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "PRO CONTROL двухступенчатый AR/CO2 1Р Mini", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101804", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20двухступенчатый%20AR/CO2%201Р%20Mini"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "PRO CONTROL AR/CO2 1Р", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "101739", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20AR/CO2%201Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С ротаметром", "name": "PRO CONTROL AR/CO2 2Р", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "101740", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20AR/CO2%202Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "У-30/АР-40-П-220-Р", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "100546", "qty": "6", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-П-220-Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "У-30/АР-40-П-36-Р", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "100547", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-П-36-Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "У-30/АР-40-П-220-Р (латунь)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102674", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-П-220-Р%20(латунь)"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "У-30/АР-40-П-36-Р (латунь)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102672", "qty": "", "url": "https://svarog-rf.ru/search/node/У-30/АР-40-П-36-Р%20(латунь)"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "PRO CONTROL AR/CO2 1Р -П-220-Р (латунь)", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "102733", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20AR/CO2%201Р%20-П-220-Р%20(латунь)"}, {"category": "РЕГУЛЯТОРЫ", "group": "С подогревателем", "name": "PRO CONTROL AR/CO2 1Р -П-36-Р (латунь)", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "102731", "qty": "", "url": "https://svarog-rf.ru/search/node/PRO%20CONTROL%20AR/CO2%201Р%20-П-36-Р%20(латунь)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Смесители", "name": "Ar/CO2 - 2Р", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "101518", "qty": "2", "url": "https://svarog-rf.ru/search/node/Ar/CO2%20-%202Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "Смесители", "name": "Ar/CO2 - 4Р", "class": "PROFESSIONAL", "warranty": "3 года", "material": "Латунь", "code": "101517", "qty": "", "url": "https://svarog-rf.ru/search/node/Ar/CO2%20-%204Р"}, {"category": "РЕГУЛЯТОРЫ", "group": "Экономайзеры", "name": "НР (AL)", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101218", "qty": "4", "url": "https://svarog-rf.ru/search/node/НР%20(AL)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Экономайзеры", "name": "Р (AL)", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101220", "qty": "", "url": "https://svarog-rf.ru/search/node/Р%20(AL)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Экономайзеры", "name": "НР (BR)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101217", "qty": "", "url": "https://svarog-rf.ru/search/node/НР%20(BR)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Экономайзеры", "name": "Р (BR)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "101219", "qty": "", "url": "https://svarog-rf.ru/search/node/Р%20(BR)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Подогреватели", "name": "ПУ-1-36В", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101228", "qty": "5", "url": "https://svarog-rf.ru/search/node/ПУ-1-36В"}, {"category": "РЕГУЛЯТОРЫ", "group": "Подогреватели", "name": "ПУ-1-220В", "class": "BASIC +", "warranty": "1 год", "material": "Алюминий", "code": "101227", "qty": "", "url": "https://svarog-rf.ru/search/node/ПУ-1-220В"}, {"category": "РЕГУЛЯТОРЫ", "group": "Подогреватели", "name": "ПУ-1-220В", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "94733", "qty": "", "url": "https://svarog-rf.ru/search/node/ПУ-1-220В"}, {"category": "РЕГУЛЯТОРЫ", "group": "Подогреватели", "name": "ПУ-1-36В (латунь)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102682", "qty": "", "url": "https://svarog-rf.ru/search/node/ПУ-1-36В%20(латунь)"}, {"category": "РЕГУЛЯТОРЫ", "group": "Подогреватели", "name": "ПУ-1-220В (латунь)", "class": "STANDART", "warranty": "2 года", "material": "Латунь", "code": "102683", "qty": "", "url": "https://svarog-rf.ru/search/node/ПУ-1-220В%20(латунь)"}]}, {"category": "РЕЗАКИ", "total": NaN, "items": [{"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р3П-02М (90°) 485мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94157", "qty": "10", "url": "https://svarog-rf.ru/search/node/Р3П-02М%20(90°)%20485мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р1ПМ (90°)  500мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "102380", "qty": "", "url": "https://svarog-rf.ru/search/node/Р1ПМ%20(90°)%20500мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р1ПМ-У (90°) 750мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "102381", "qty": "", "url": "https://svarog-rf.ru/search/node/Р1ПМ-У%20(90°)%20750мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р1П (135°) 750мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "102406", "qty": "", "url": "https://svarog-rf.ru/search/node/Р1П%20(135°)%20750мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р3П-02М-У (135°) 760мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94158", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-02М-У%20(135°)%20760мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р3П-22Р (90°) 486мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94159", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-22Р%20(90°)%20486мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р3П-22Р-У (135°) 768мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94160", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-22Р-У%20(135°)%20768мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р2А-02М (90°) 485мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94169", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-02М%20(90°)%20485мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "Р2А-22Р (90°) 486мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94170", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-22Р%20(90°)%20486мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - двухтрубные", "name": "РЗП/2А-02М (90°) 485мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94473", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗП/2А-02М%20(90°)%20485мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р3П-32 (90°) 535мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94180", "qty": "9", "url": "https://svarog-rf.ru/search/node/Р3П-32%20(90°)%20535мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р3П-32-Р (90°) 535мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94175", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-32-Р%20(90°)%20535мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р3П-32-У2 (105°) 1000мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94181", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-32-У2%20(105°)%201000мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р3П-32-Р-У2 (105°) 1000мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94176", "qty": "", "url": "https://svarog-rf.ru/search/node/Р3П-32-Р-У2%20(105°)%201000мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "РЗП/Р2А-32 (90°) 535мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94474", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗП/Р2А-32%20(90°)%20535мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р2А-32 (90°) 535мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94182", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-32%20(90°)%20535мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р2А-32-Р (90°) 535мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94177", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-32-Р%20(90°)%20535мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р2А-32-У2 (105°) 1000мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94183", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-32-У2%20(105°)%201000мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 32)", "name": "Р2А-32-Р-У2 (105°) 1000мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94178", "qty": "", "url": "https://svarog-rf.ru/search/node/Р2А-32-Р-У2%20(105°)%201000мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 345)", "name": "РЗ-345-Р (90°) 500мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "101221", "qty": "2", "url": "https://svarog-rf.ru/search/node/РЗ-345-Р%20(90°)%20500мм"}, {"category": "РЕЗАКИ", "group": "С внутрисопловым смешением газов - трехтрубные (серия 345)", "name": "РЗ-345-Р-У (90°) 900мм", "class": "STANDART", "warranty": "2 года", "material": "", "code": "101222", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗ-345-Р-У%20(90°)%20900мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - трехтрубные (серия 62 -3F)", "name": "РЗ 62-3F (90°) 480мм", "class": "PROFESSIONAL", "warranty": "3 года", "material": "", "code": "101223", "qty": "4", "url": "https://svarog-rf.ru/search/node/РЗ%2062-3F%20(90°)%20480мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - трехтрубные (серия 62 -3F)", "name": "РЗ 62-3F в кейсе (90°) 480мм", "class": "PROFESSIONAL", "warranty": "3 года", "material": "", "code": "101225", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗ%2062-3F%20в%20кейсе%20(90°)%20480мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - трехтрубные (серия 62 -3F)", "name": "РЗ 62-3F  (90°) 1100мм", "class": "PROFESSIONAL", "warranty": "3 года", "material": "", "code": "101224", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗ%2062-3F%20(90°)%201100мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные - трехтрубные (серия 62 -3F)", "name": "РЗУ 62-3F (110°)  1100мм", "class": "PROFESSIONAL", "warranty": "3 года", "material": "", "code": "95656", "qty": "", "url": "https://svarog-rf.ru/search/node/РЗУ%2062-3F%20(110°)%201100мм"}, {"category": "РЕЗАКИ", "group": "Инжекторные повышенной мощности (серия - Р5ПГ)", "name": "Р5ПГ - 1300, 135°", "class": "STANDART", "warranty": "2 года", "material": "", "code": "100553", "qty": "2", "url": "https://svarog-rf.ru/search/node/Р5ПГ%20-%201300,%20135°"}, {"category": "РЕЗАКИ", "group": "Инжекторные повышенной мощности (серия - Р5ПГ)", "name": "Р5ПГ - 1300, 180°", "class": "STANDART", "warranty": "2 года", "material": "", "code": "100552", "qty": "", "url": "https://svarog-rf.ru/search/node/Р5ПГ%20-%201300,%20180°"}]}, {"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "total": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "items": [{"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "group": "Г2-М", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94207", "qty": "5", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "group": "Г2-23", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94208", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "group": "Г2-3Н", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94224", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "group": "Г3У-3-23", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94209", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ СВАРОЧНЫЕ", "group": "Г3У-4-45", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94210", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}]}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "total": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "items": [{"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-103-Р", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94199", "qty": "9", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-1714-ПП (с пьезоподжигом)", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94476", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-100", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94200", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-100-Р", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94201", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-111", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94203", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-111-Р", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94204", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-121", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94205", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-121-P", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94206", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}, {"category": "ГОРЕЛКИ ГАЗОВОЗДУШНЫЕ", "group": "ГВ-131", "name": "STANDART", "class": "STANDART", "warranty": "2 года", "material": "", "code": "94475", "qty": "", "url": "https://svarog-rf.ru/search/node/STANDART"}]}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "total": null, "items": [{"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG1-30 (рельс+штанга)", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "99179", "qty": "7", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG1-30 Plasma (рельс+штанга)", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "99181", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG1-100 (рельс+штанга)", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "99182", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG2-11G", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "98347", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG2-11 (магнитная)", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "98349", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG2-11D", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "98350", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}, {"category": "МАШИНЫ ТЕРМИЧЕСКОЙ РЕЗКИ", "group": "CG2-150", "name": "BASIC +", "class": "BASIC +", "warranty": "1 год", "material": "", "code": "98348", "qty": "", "url": "https://svarog-rf.ru/search/node/BASIC%20+"}]}];
+const classes = ["BASIC +", "PROFESSIONAL", "STANDART"];
+const warranties = ["1 год", "2 года", "3 года"];
+
+const categoryFilter = document.getElementById('categoryFilter');
+const classFilter = document.getElementById('classFilter');
+const warrantyFilter = document.getElementById('warrantyFilter');
+const groupFilter = document.getElementById('groupFilter');
+const searchInput = document.getElementById('searchInput');
+const categoryList = document.getElementById('categoryList');
+const contentArea = document.getElementById('contentArea');
+const contentTitle = document.getElementById('contentTitle');
+
+let selectedCategory = '';
+
+function badgeClass(cls) {
+  if ((cls || '').includes('BASIC')) return 'basic';
+  if ((cls || '').includes('PROFESSIONAL')) return 'pro';
+  return 'standard';
+}
+
+function allGroups() {
+  const set = new Set();
+  data.forEach(cat => cat.items.forEach(item => set.add(item.group)));
+  return Array.from(set).sort((a,b) => a.localeCompare(b, 'ru'));
+}
+
+function populateFilters() {
+  data.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.category;
+    opt.textContent = cat.category;
+    categoryFilter.appendChild(opt);
+  });
+  classes.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    classFilter.appendChild(opt);
+  });
+  warranties.forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = w;
+    warrantyFilter.appendChild(opt);
+  });
+  allGroups().forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g;
+    opt.textContent = g;
+    groupFilter.appendChild(opt);
+  });
+}
+
+function renderCategoryList() {
+  categoryList.innerHTML = '';
+  data.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'category-card' + (selectedCategory === cat.category ? ' active' : '');
+    card.innerHTML = `
+      <div class="t">${cat.category}</div>
+      <div class="s">${cat.items.length} SKU · ${new Set(cat.items.map(i => i.group)).size} групп</div>
+    `;
+    card.onclick = () => {
+      selectedCategory = cat.category;
+      categoryFilter.value = cat.category;
+      renderCategoryList();
+      renderContent();
+    };
+    categoryList.appendChild(card);
+  });
+}
+
+function getFilteredData() {
+  const s = searchInput.value.trim().toLowerCase();
+  const catVal = categoryFilter.value || selectedCategory;
+  const clsVal = classFilter.value;
+  const warVal = warrantyFilter.value;
+  const grpVal = groupFilter.value;
+
+  return data
+    .filter(cat => !catVal || cat.category === catVal)
+    .map(cat => {
+      const items = cat.items.filter(item => {
+        const text = [item.category, item.group, item.name, item.class, item.warranty, item.code].join(' ').toLowerCase();
+        return (!s || text.includes(s))
+          && (!clsVal || item.class === clsVal)
+          && (!warVal || item.warranty === warVal)
+          && (!grpVal || item.group === grpVal);
+      });
+      return {...cat, items};
+    })
+    .filter(cat => cat.items.length > 0);
+}
+
+function renderContent() {
+  const filtered = getFilteredData();
+  const currentTitle = (categoryFilter.value || selectedCategory) ? `Матрица: ${categoryFilter.value || selectedCategory}` : 'Матрица ассортимента';
+  contentTitle.textContent = currentTitle;
+
+  if (!filtered.length) {
+    contentArea.innerHTML = '<div class="muted">По заданным условиям ничего не найдено.</div>';
+    return;
+  }
+
+  contentArea.innerHTML = filtered.map(cat => {
+    const groups = {};
+    cat.items.forEach(item => {
+      if (!groups[item.group]) groups[item.group] = [];
+      groups[item.group].push(item);
+    });
+
+    return Object.entries(groups).map(([group, items], idx) => `
+      <div class="group-block">
+        <div class="group-header" onclick="toggleGroup(this)">
+          <h4>${group}</h4>
+          <div class="meta">${items.length} SKU</div>
+        </div>
+        <div class="group-body">
+          <table>
+            <thead>
+              <tr>
+                <th>Наименование</th>
+                <th>Класс</th>
+                <th>Гарантия</th>
+                <th>Материал</th>
+                <th>Код</th>
+                <th>Ссылка</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td><strong>${item.name}</strong></td>
+                  <td><span class="badge ${badgeClass(item.class)}">${item.class || '—'}</span></td>
+                  <td>${item.warranty || '—'}</td>
+                  <td>${item.material || '—'}</td>
+                  <td>${item.code || '—'}</td>
+                  <td><a class="link" href="${item.url}" target="_blank">Открыть ↗</a></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `).join('');
+  }).join('');
+}
+
+function toggleGroup(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+document.getElementById('applyBtn').onclick = renderContent;
+document.getElementById('resetBtn').onclick = () => {
+  selectedCategory = '';
+  searchInput.value = '';
+  categoryFilter.value = '';
+  classFilter.value = '';
+  warrantyFilter.value = '';
+  groupFilter.value = '';
+  renderCategoryList();
+  renderContent();
+};
+
+populateFilters();
+renderCategoryList();
+renderContent();
+</script>
+</body>
+</html>
